@@ -116,7 +116,7 @@ format_msg(Parents, Data, Config = #{map_depth := Depth}) when is_map(Data) ->
                     Config#{map_depth := Depth-1}) | Acc]
       ;  (K, V, Acc) ->
         [Parents ++ to_string(K, Config), $=,
-         to_string(V, Config), $\s | Acc]
+         to_string(V, Config), $\| | Acc]
       end,
       [],
       Data
@@ -197,10 +197,9 @@ escape(Str) ->
             [$", do_escape(Str), $"]
     end.
 
-needs_quoting(_Str) ->
-    %string:find(Str, " ") =/= nomatch orelse
-    %string:find(Str, "=") =/= nomatch.
-    true.
+needs_quoting(Str) ->
+    string:find(Str, " ") =/= nomatch orelse
+    string:find(Str, "=") =/= nomatch.
 
 needs_escape(Str) ->
     string:find(Str, "\"") =/= nomatch orelse
