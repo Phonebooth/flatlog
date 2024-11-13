@@ -197,9 +197,10 @@ escape(Str) ->
             [$", do_escape(Str), $"]
     end.
 
-needs_quoting(Str) ->
-    string:find(Str, " ") =/= nomatch orelse
-    string:find(Str, "=") =/= nomatch.
+needs_quoting(_Str) ->
+    %string:find(Str, " ") =/= nomatch orelse
+    %string:find(Str, "=") =/= nomatch.
+    true.
 
 needs_escape(Str) ->
     string:find(Str, "\"") =/= nomatch orelse
