@@ -68,7 +68,7 @@ apply_defaults(Map) ->
         template => [colored_start, "when=", time, " level=", level,
                      {id, [" id=", id], ""}, {parent_id, [" parent_id=", parent_id], ""},
                      {correlation_id, [" correlation_id=", correlation_id], ""},
-                     {pid, [" pid=", pid], ""}, " at=", mfa, ":", line, colored_end, " ", msg, "\n"]
+                     {pid, [" pid=", pid], ""}, " at=", mfa, ":", line, colored_end, "| ", msg, "\n"]
        },
       Map
     ).
@@ -116,7 +116,7 @@ format_msg(Parents, Data, Config = #{map_depth := Depth}) when is_map(Data) ->
                     Config#{map_depth := Depth-1}) | Acc]
       ;  (K, V, Acc) ->
         [Parents ++ to_string(K, Config), $=,
-         to_string(V, Config), $\| | Acc]
+         to_string(V, Config), $\|, $\s | Acc]
       end,
       [],
       Data
