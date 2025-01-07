@@ -34,7 +34,21 @@ format(#{level:=Level, msg:={report, Msg}, meta:=Meta}, UsrConfig) when is_map(M
                                 ,colored_start => Level
                                 ,colored_end => "\e[0m"
                                 }),
-    format_log(maps:get(template, Config), Config, Msg, NewMeta);
+    KeysKeep = maps:get(keys_keep,Config),
+    KeepMsg = case KeysKeep =/= [] of
+                 true ->
+                     maps:with(KeysKeep,Msg);
+                 false ->
+                    Msg
+             end,
+    KeysRemove = maps:get(keys_remove,Config),
+    RemoveMsg = case KeysRemove =/= [] of
+                    true ->
+                        maps:without(KeysRemove, KeepMsg);
+                    false ->
+                        KeepMsg
+                end,
+    format_log(maps:get(template, Config), Config, RemoveMsg, NewMeta);
 format(Map = #{msg := {report, KeyVal}}, UsrConfig) when is_list(KeyVal) ->
     format(Map#{msg := {report, maps:from_list(KeyVal)}}, UsrConfig);
 format(Map = #{msg := {string, String}}, UsrConfig) ->
@@ -68,7 +82,10 @@ apply_defaults(Map) ->
         template => [colored_start, "when=", time, " level=", level,
                      {id, [" id=", id], ""}, {parent_id, [" parent_id=", parent_id], ""},
                      {correlation_id, [" correlation_id=", correlation_id], ""},
-                     {pid, [" pid=", pid], ""}, " at=", mfa, ":", line, colored_end, "| ", msg, "\n"]
+                     {pid, [" pid=", pid], ""}, " at=", mfa, ":", line, colored_end, " ", msg,
+                     "\n"],
+        keys_filter => [],
+        keys_remove => []
        },
       Map
     ).
@@ -116,7 +133,7 @@ format_msg(Parents, Data, Config = #{map_depth := Depth}) when is_map(Data) ->
                     Config#{map_depth := Depth-1}) | Acc]
       ;  (K, V, Acc) ->
         [Parents ++ to_string(K, Config), $=,
-         to_string(V, Config), $\|, $\s | Acc]
+         to_string(V, Config), $\s | Acc]
       end,
       [],
       Data
