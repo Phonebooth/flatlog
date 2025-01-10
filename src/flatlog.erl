@@ -34,14 +34,14 @@ format(#{level:=Level, msg:={report, Msg}, meta:=Meta}, UsrConfig) when is_map(M
                                 ,colored_start => Level
                                 ,colored_end => "\e[0m"
                                 }),
-    KeysKeep = maps:get(keys_keep,Config),
+    KeysKeep = maps:get(keys_keep,Config,[]),
     KeepMsg = case KeysKeep =/= [] of
                  true ->
                      maps:with(KeysKeep,Msg);
                  false ->
                     Msg
              end,
-    KeysRemove = maps:get(keys_remove,Config),
+    KeysRemove = maps:get(keys_remove,Config,[]),
     RemoveMsg = case KeysRemove =/= [] of
                     true ->
                         maps:without(KeysRemove, KeepMsg);
